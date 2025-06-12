@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>เช็คสถานะเคลมสินค้า</title>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f0f8ff;
+      color: #003366;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    input, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+
+    button:hover {
+      background-color: #1976d2;
+    }
+
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>ตรวจสอบสถานะการเคลมสินค้าร้านholysai</h1><br>
+  <h1>พบปัญหาในการใช้งานติดต่อได้ที่ ID @Fiio (มี@ด้วยนะ)</h1>
+  <p>กรอกเลข Tracking เพื่อตรวจสอบ</p>
+  <input type="text" id="trackingInput" placeholder="กรอกเลขพัสดุ...">
+  <button onclick="checkStatus()">ตรวจสอบ</button>
+
+  <div class="result" id="resultBox">
+    <h2>ผลการตรวจสอบ</h2>
+    <p><strong>วันที่รับของ:</strong> <span id="date"></span></p>
+    <p><strong>รุ่นสินค้า:</strong> <span id="model"></span></p>
+    <p><strong>สถานะล่าสุด:</strong> <span id="status"></span></p>
+  </div>
+
+  <script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1KFI2XDxnN_a9b-IWAD3waL4vLYuRmeGJg_2_W4q4Tb8/export?format=csv';
+
+    async function checkStatus() {
+      const tracking = document.getElementById('trackingInput').value.trim();
+      if (!tracking) {
+        alert("กรุณากรอกเลขพัสดุ");
+        return;
+      }
+
+      const response = await fetch(sheetUrl);
+      const data = await response.text();
+      const rows = data.split('\n').map(row => row.split(','));
+
+      const found = rows.find(row => row[0] === tracking);
+      const resultBox = document.getElementById('resultBox');
+
+      if (found) {
+        document.getElementById('date').innerText = found[1];
+        document.getElementById('model').innerText = found[2];
+        document.getElementById('status').innerText = found[3];
+        resultBox.style.display = 'block';
+      } else {
+        resultBox.style.display = 'block';
+        document.getElementById('date').innerText = '-';
+        document.getElementById('model').innerText = '-';
+        document.getElementById('status').innerText = 'ไม่พบข้อมูล กรุณาตรวจสอบเลขพัสดุ';
+      }
+    }
+  </script>
+</body>
+</html>
